@@ -11,7 +11,7 @@ export default function ProductListing() {
   const [reservingId, setReservingId] = useState<string | null>(null);
   const router = useRouter();
 
-  // 🟢 Live Ticker System Logs State
+
   const [systemLogs, setSystemLogs] = useState<string[]>([]);
 
   useEffect(() => {
@@ -182,7 +182,6 @@ export default function ProductListing() {
                     </div>
                   </div>
 
-                  {/* 📊 Premium Real-time Inventory Progress Bar Layout */}
                   <div className="mb-5">
                     <div className="flex justify-between text-[11px] font-semibold text-gray-400 mb-1.5 uppercase tracking-wider">
                       <span>Stock Depletion Ratio</span>
@@ -198,7 +197,7 @@ export default function ProductListing() {
                     </div>
                   </div>
 
-                  {/* 🏷️ Premium Enterprise Status Pill Badges Grid */}
+
                   <div className="space-y-3 border-t border-gray-100 pt-4 mb-5">
                     <div className="flex justify-between items-center text-sm">
                       <span className="text-gray-500 font-medium">Sub-Inventory Total Base:</span>
