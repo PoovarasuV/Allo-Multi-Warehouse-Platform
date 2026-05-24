@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
+// Add this line to prevent the build-time execution error
+export const dynamic = 'force-dynamic';
+
 export async function POST() {
   try {
     // 1. Flush all active reservation logs to clear concurrency leases
@@ -9,15 +12,13 @@ export async function POST() {
     // 2. Clear out existing stock counters completely
     await prisma.stock.deleteMany({});
 
-    // 3. Re-establish pristine starting metrics (6 units for w1, 4 units for w2)
+    // 3. Re-establish pristine starting metrics
     const productIds = ["p1", "p2", "p3"];
     
     for (const id of productIds) {
-      // Restore Warehouse 1 (w1)
       await prisma.stock.create({
         data: { productId: id, warehouseId: "w1", totalQty: 6, reservedQty: 0 },
       });
-      // Restore Warehouse 2 (w2)
       await prisma.stock.create({
         data: { productId: id, warehouseId: "w2", totalQty: 4, reservedQty: 0 },
       });
