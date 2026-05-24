@@ -1,0 +1,63 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Product {
+  // Removed default(cuid()) so we can enforce clean tracking keys like p1, p2, p3
+  id        String   @id
+  name      String
+  createdAt DateTime @default(now())
+
+  stocks       Stock[]
+  reservations Reservation[]
+}
+
+model Warehouse {
+  // Removed default(cuid()) so we can use recognizable location codes like w1, w2
+  id        String   @id
+  name      String
+  createdAt DateTime @default(now())
+
+  stocks       Stock[]
+  reservations Reservation[]
+}
+
+model Stock {
+  id          String @id @default(cuid())
+  productId   String
+  warehouseId String
+
+  // Maintained your exact quantity naming conventions
+  totalQty    Int
+  reservedQty Int    @default(0)
+
+  product   Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
+  warehouse Warehouse @relation(fields: [warehouseId], references: [id], onDelete: Cascade)
+
+  @@unique([productId, warehouseId], name: "productId_warehouseId")
+}
+
+model Reservation {
+  id          String            @id @default(cuid())
+  productId   String
+  warehouseId String
+  quantity    Int
+  status      ReservationStatus @default(PENDING)
+
+  expiresAt DateTime
+  createdAt DateTime          @default(now())
+
+  product   Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
+  warehouse Warehouse @relation(fields: [warehouseId], references: [id], onDelete: Cascade)
+}
+
+enum ReservationStatus {
+  PENDING
+  CONFIRMED
+  RELEASED
+}
