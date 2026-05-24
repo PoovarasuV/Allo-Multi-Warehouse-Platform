@@ -1,9 +1,11 @@
-import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma"; // Adjust this path to match your custom setup folder
+\import { NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
+
+// Add this line to force runtime execution and bypass build-time static analysis
+export const dynamic = 'force-dynamic';
 
 export async function GET() {
   try {
-    // Pull products along with their multi-warehouse stock allocations
     const dbProducts = await prisma.product.findMany({
       include: {
         stocks: {
@@ -14,14 +16,11 @@ export async function GET() {
       },
     });
 
-    // Format data so it satisfies your frontend UI types exactly
     const formattedProducts = dbProducts.map((prod) => {
-      // Calculate consolidated global totals across all operational warehouses
       const totalStock = prod.stocks.reduce((sum, s) => sum + s.totalQty, 0);
       const reservedStock = prod.stocks.reduce((sum, s) => sum + s.reservedQty, 0);
       const availableStock = totalStock - reservedStock;
 
-      // Cleanly map the matrix inner table fields
       const warehouses = prod.stocks.map((s) => ({
         warehouseId: s.warehouseId,
         warehouseName: `${s.warehouse.name}`,
