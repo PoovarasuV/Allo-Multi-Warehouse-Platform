@@ -1,46 +1,36 @@
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 
+// CRITICAL: Prevent build-time static analysis
+export const dynamic = 'force-dynamic';
+
 export async function POST(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
+  
   try {
-    const { id } = await params;
+    const result = await prisma.$transaction(async (tx) => {
+      // 1. Get the reservation
+      const reservation = await tx.reservation.findUnique({ where: { id } });
+      if (!reservation) throw new Error("Not found");
 
-    const reservation = await prisma.reservation.findUnique({
-      where: { id },
-    });
-
-    if (!reservation) {
-      return NextResponse.json({ error: "Not found" }, { status: 404 });
-    }
-
-    await prisma.$transaction(async (tx) => {
-      // rollback stock
+      // 2. Release the stock back to the warehouse
       await tx.stock.updateMany({
-        where: {
-          productId: reservation.productId,
-          warehouseId: reservation.warehouseId,
-        },
-        data: {
-          reservedQty: {
-            decrement: reservation.quantity,
-          },
-        },
+        where: { productId: reservation.productId, warehouseId: reservation.warehouseId },
+        data: { reservedQty: { decrement: reservation.quantity } }
       });
 
-      await tx.reservation.update({
+      // 3. Mark the reservation as released
+      return await tx.reservation.update({
         where: { id },
-        data: { status: "RELEASED" },
+        data: { status: "RELEASED" }
       });
     });
 
-    return NextResponse.json({ success: true });
-  } catch {
-    return NextResponse.json(
-      { error: "Internal error" },
-      { status: 500 }
-    );
+    return NextResponse.json({ success: true, result });
+  } catch (error) {
+    return NextResponse.json({ error: "Release failed" }, { status: 500 });
   }
 }

@@ -1,6 +1,9 @@
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 
+// THIS IS THE KEY FIX:
+export const dynamic = 'force-dynamic';
+
 export async function POST(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -16,7 +19,6 @@ export async function POST(
       return NextResponse.json({ error: "Not found" }, { status: 404 });
     }
 
-    // ❌ EXPIRED CHECK (IMPORTANT FOR 410)
     if (new Date(reservation.expiresAt) < new Date()) {
       return NextResponse.json(
         { error: "Reservation expired" },
