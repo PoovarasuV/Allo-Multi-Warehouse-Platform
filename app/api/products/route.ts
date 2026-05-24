@@ -1,4 +1,4 @@
-\import { NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
 // Add this line to force runtime execution and bypass build-time static analysis
