@@ -1,4 +1,5 @@
-// Add this interface to your types file
+// src/lib/types.ts
+
 export interface Warehouse {
   warehouseId: string;
   warehouseName: string;
@@ -12,6 +13,14 @@ export interface Product {
   totalStock: number;
   reservedStock: number;
   availableStock: number;
-  // Add this property
-  warehouses: Warehouse[]; 
+  warehouses: Warehouse[];
+}
+
+// Add this interface definition and export
+export interface Reservation {
+  id: string;
+  productId: string;
+  warehouseId: string;
+  status: 'PENDING' | 'CONFIRMED' | 'EXPIRED';
+  createdAt: string;
 }
