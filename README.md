@@ -1,13 +1,15 @@
-Allo Multi-Warehouse Platform
+# Allo Multi-Warehouse Platform
+
 A distributed inventory management system built to handle high-concurrency reservation scenarios using atomic database transactions.
 
 
 # Prerequisites
-Node.js (v18+)
 
-A Neon Postgres instance (Free Tier)
+- Node.js (v18+)
 
-.env.local file populated with DATABASE_URL
+- A Neon Postgres instance (Free Tier)
+
+- .env.local file populated with DATABASE_URL
 
 # Setup
 Bash
